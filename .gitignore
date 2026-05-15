@@ -1,0 +1,11 @@
+# Local build/support files
+.codex_spreadsheet_build/
+
+# Microsoft Office temporary files
+~$*.docx
+~$*.xlsx
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/

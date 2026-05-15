@@ -1,0 +1,1961 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>华沿机器人智能焊接助手</title>
+  <link rel="icon" type="image/svg+xml" href="https://www.huayan-robotics.com/themes/cn/default/assets/images/logo.svg" />
+  <link rel="shortcut icon" href="https://www.huayan-robotics.com/themes/cn/default/assets/images/logo.svg" />
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-2: #f8fafc;
+      --line: #d9e2ef;
+      --line-strong: #b7c6d9;
+      --text: #162033;
+      --muted: #5c6b82;
+      --blue: #1769e0;
+      --blue-soft: #e8f1ff;
+      --green: #16885f;
+      --green-soft: #e8f7f0;
+      --yellow: #b77900;
+      --yellow-soft: #fff5d8;
+      --red: #c7352d;
+      --red-soft: #fdebea;
+      --cyan: #05758f;
+      --shadow: 0 14px 40px rgba(30, 55, 90, 0.12);
+      --radius: 8px;
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 72px 1fr;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 0 28px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 280px;
+    }
+
+    .brand-logo-crop {
+      width: 58px;
+      height: 42px;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .brand-logo {
+      width: 128px;
+      height: 42px;
+      display: block;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    .top-status {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--line-strong);
+      flex: 0 0 auto;
+    }
+
+    .dot.good {
+      background: var(--green);
+    }
+
+    .dot.warn {
+      background: var(--yellow);
+    }
+
+    .dot.bad {
+      background: var(--red);
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .sidebar {
+      background: #ffffff;
+      border-right: 1px solid var(--line);
+      padding: 18px 14px;
+      overflow-y: auto;
+    }
+
+    .nav-title {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-legend {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .nav-item {
+      width: 100%;
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: #fff;
+      color: var(--text);
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: var(--panel-2);
+      border-color: var(--line);
+    }
+
+    .nav-item.active {
+      background: var(--blue-soft);
+      border-color: #9cc4ff;
+      box-shadow: inset 4px 0 0 var(--blue);
+    }
+
+    .nav-index {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #edf2f8;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .nav-item.active .nav-index {
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .nav-label {
+      min-width: 0;
+    }
+
+    .nav-label strong {
+      display: block;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-label span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-state {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--line-strong);
+    }
+
+    .nav-state.done {
+      background: var(--green);
+    }
+
+    .nav-state.current {
+      background: var(--blue);
+    }
+
+    .nav-state.alert {
+      background: var(--red);
+    }
+
+    .content {
+      min-width: 0;
+      padding: 22px;
+      overflow-y: auto;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 760px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: #edf2f8;
+      color: var(--text);
+      border: 1px solid var(--line);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .btn.good {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .btn.warn {
+      background: var(--yellow);
+      border-color: var(--yellow);
+      color: #fff;
+    }
+
+    .btn.bad {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    .btn.ghost {
+      background: #fff;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel.tight {
+      box-shadow: none;
+    }
+
+    .panel-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .metric {
+      padding: 18px;
+      min-height: 116px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .metric small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .status.green {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .status.yellow {
+      background: var(--yellow-soft);
+      color: var(--yellow);
+    }
+
+    .status.red {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      background: var(--panel-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    tr.selectable {
+      cursor: pointer;
+    }
+
+    tr.selectable:hover td {
+      background: #f3f8ff;
+    }
+
+    tr.selected td {
+      background: var(--blue-soft);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      min-height: 46px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      padding: 9px 11px;
+      outline: none;
+    }
+
+    .field textarea {
+      min-height: 98px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.14);
+    }
+
+    .step-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .equipment-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .equipment-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+
+    .equipment-row strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .equipment-row span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .flow-line {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .flow-card {
+      min-height: 88px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+
+    .flow-card strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .bar {
+      height: 10px;
+      border-radius: 999px;
+      background: #e5ebf2;
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--blue);
+    }
+
+    .bar.green > span {
+      background: var(--green);
+    }
+
+    .bar.yellow > span {
+      background: var(--yellow);
+    }
+
+    .bar.red > span {
+      background: var(--red);
+    }
+
+    .weld-stage {
+      min-height: 318px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .robot-visual {
+      position: relative;
+      min-height: 318px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(22, 32, 51, 0.05) 1px, transparent 1px),
+        linear-gradient(rgba(22, 32, 51, 0.05) 1px, transparent 1px),
+        #f8fbff;
+      background-size: 28px 28px;
+      overflow: hidden;
+    }
+
+    .robot-base {
+      position: absolute;
+      left: 13%;
+      bottom: 15%;
+      width: 112px;
+      height: 58px;
+      border-radius: 8px;
+      background: #516072;
+    }
+
+    .robot-arm-a,
+    .robot-arm-b,
+    .robot-torch {
+      position: absolute;
+      transform-origin: left center;
+      border-radius: 999px;
+      background: #1769e0;
+    }
+
+    .robot-arm-a {
+      left: calc(13% + 74px);
+      bottom: calc(15% + 42px);
+      width: 190px;
+      height: 26px;
+      transform: rotate(-28deg);
+    }
+
+    .robot-arm-b {
+      left: calc(13% + 230px);
+      bottom: calc(15% + 128px);
+      width: 172px;
+      height: 22px;
+      background: #18a17a;
+      transform: rotate(25deg);
+    }
+
+    .robot-torch {
+      left: calc(13% + 377px);
+      bottom: calc(15% + 64px);
+      width: 88px;
+      height: 16px;
+      background: #303b4b;
+      transform: rotate(53deg);
+    }
+
+    .workpiece {
+      position: absolute;
+      right: 10%;
+      bottom: 15%;
+      width: 210px;
+      height: 86px;
+      border-radius: 8px;
+      background: repeating-linear-gradient(135deg, #c7d2df 0 14px, #dce5ef 14px 28px);
+      border: 1px solid #a8b7c9;
+    }
+
+    .arc {
+      position: absolute;
+      right: 20%;
+      bottom: 31%;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--yellow);
+      box-shadow: 0 0 0 8px rgba(255, 190, 60, 0.22), 0 0 26px rgba(255, 183, 0, 0.75);
+      opacity: 0;
+    }
+
+    .is-welding .arc {
+      animation: pulse 0.8s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        opacity: 0.55;
+        transform: scale(0.86);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1.18);
+      }
+    }
+
+    .process-values {
+      display: grid;
+      gap: 10px;
+    }
+
+    .value-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 12px;
+      border-radius: 8px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+    }
+
+    .value-row span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .value-row strong {
+      font-size: 17px;
+    }
+
+    .trace-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .trace-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+
+    .trace-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    .chart-bars {
+      display: grid;
+      gap: 14px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 104px 1fr 58px;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .donut {
+      width: min(260px, 72vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(var(--green) 0 78%, var(--red) 78% 88%, var(--yellow) 88% 100%);
+      display: grid;
+      place-items: center;
+      margin: 0 auto;
+    }
+
+    .donut::after {
+      content: "质量 OK 78%";
+      width: 58%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-weight: 800;
+      color: var(--text);
+      padding: 16px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      max-width: min(420px, calc(100vw - 40px));
+      background: #162033;
+      color: #fff;
+      border-radius: 8px;
+      padding: 13px 16px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(14px);
+      pointer-events: none;
+      transition: 0.22s ease;
+      z-index: 50;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1180px) {
+      .grid.cols-4,
+      .grid.cols-3,
+      .flow-line,
+      .trace-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .chart-grid,
+      .weld-stage {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        grid-template-rows: auto 1fr;
+      }
+
+      .topbar {
+        position: static;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 16px;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 12px;
+        overflow-x: auto;
+      }
+
+      .nav-list {
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(210px, 1fr);
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .section-head {
+        flex-direction: column;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .grid.cols-4,
+      .grid.cols-3,
+      .grid.cols-2,
+      .flow-line,
+      .trace-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .equipment-row {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .chart-row {
+        grid-template-columns: 86px 1fr 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo-crop">
+          <img class="brand-logo" src="https://www.huayan-robotics.com/themes/cn/default/assets/images/logo.svg" alt="华沿机器人" />
+        </div>
+        <div>
+          <h1>华沿机器人智能焊接助手</h1>
+        </div>
+      </div>
+      <div class="top-status">
+        <span class="chip"><span class="dot good" id="topRobotDot"></span><span id="topRobotText">机器人 RBT-06 正常</span></span>
+        <span class="chip"><span class="dot warn" id="topTaskDot"></span><span id="topTaskText">当前任务待确认</span></span>
+        <span class="chip">操作员：<strong id="topOperator">未登录</strong></span>
+        <button class="btn primary" data-nav="dashboard">返回工作台</button>
+      </div>
+    </header>
+
+    <main class="shell">
+      <aside class="sidebar">
+        <p class="nav-title">操作闭环</p>
+        <nav class="nav-list" id="navList"></nav>
+        <div class="nav-legend" aria-label="操作闭环状态说明">
+          <div class="legend-row"><span class="nav-state current"></span><span>蓝色：当前页面</span></div>
+          <div class="legend-row"><span class="nav-state done"></span><span>绿色：已完成 / 已确认</span></div>
+          <div class="legend-row"><span class="nav-state"></span><span>灰色：未处理</span></div>
+          <div class="legend-row"><span class="nav-state alert"></span><span>红色：异常 / 需处理</span></div>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="view active" id="view-dashboard">
+          <div class="section-head">
+            <div>
+              <h2>今日任务工作台</h2>
+              <p>面向工控触屏的现场首页，集中显示设备、人员、任务、报警和快速入口。</p>
+            </div>
+            <div class="actions">
+              <button class="btn primary" data-nav="login">开始作业流程</button>
+              <button class="btn ghost" data-nav="trace">查看焊缝追溯</button>
+              <button class="btn ghost" data-nav="bi">打开 BI 看板</button>
+            </div>
+          </div>
+
+          <div class="grid cols-4">
+            <div class="panel metric">
+              <span>待焊任务</span>
+              <strong id="metricPending">18</strong>
+              <small>区域 A3 / B1 优先</small>
+            </div>
+            <div class="panel metric">
+              <span>进行中</span>
+              <strong id="metricRunning">0</strong>
+              <small id="metricRunningNote">暂无焊接任务</small>
+            </div>
+            <div class="panel metric">
+              <span>待检查</span>
+              <strong id="metricInspect">6</strong>
+              <small>外观、尺寸、附件</small>
+            </div>
+            <div class="panel metric">
+              <span>今日完成率</span>
+              <strong id="metricRate">62%</strong>
+              <small>完成 31 / 总计 50</small>
+            </div>
+          </div>
+
+          <div class="grid cols-2" style="margin-top:14px;">
+            <div class="panel">
+              <div class="panel-head">
+                <h3>设备与自检</h3>
+                <span class="status yellow" id="dashboardPrecheck">待自检</span>
+              </div>
+              <div class="panel-body equipment-list">
+                <div class="equipment-row">
+                  <div><strong>机器人 RBT-06</strong><span>控制器在线，程序读取正常</span></div>
+                  <span class="status green">正常</span>
+                  <button class="btn ghost" data-nav="precheck">查看</button>
+                </div>
+                <div class="equipment-row">
+                  <div><strong>焊机 WLD-350</strong><span>电流/电压采集通道待确认</span></div>
+                  <span class="status yellow" id="welderStatus">待确认</span>
+                  <button class="btn ghost" data-nav="precheck">自检</button>
+                </div>
+                <div class="equipment-row">
+                  <div><strong>气瓶 GAS-A12</strong><span>当前气体：Ar+CO2 80/20</span></div>
+                  <span class="status green">正常</span>
+                  <button class="btn ghost" data-nav="material">扫码</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>报警与待办</h3>
+                <span class="status red">2 条待处理</span>
+              </div>
+              <div class="panel-body equipment-list">
+                <div class="equipment-row">
+                  <div><strong>工艺参数偏差</strong><span>任务 W-A3-018 实际电压高于推荐值 1.1V</span></div>
+                  <span class="status yellow">复核</span>
+                  <button class="btn ghost" data-nav="process">处理</button>
+                </div>
+                <div class="equipment-row">
+                  <div><strong>检查附件缺失</strong><span>焊缝 W-B1-006 检查结果已录入，照片未上传</span></div>
+                  <span class="status red">补充</span>
+                  <button class="btn ghost" data-nav="inspection">处理</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px;">
+            <div class="panel-head">
+              <h3>待执行焊缝任务</h3>
+              <span class="status blue">点击任务进入确认</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>任务号</th>
+                    <th>焊缝编号</th>
+                    <th>项目 / 订单</th>
+                    <th>区域</th>
+                    <th>类型</th>
+                    <th>板厚</th>
+                    <th>长度</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardTaskRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="view-login">
+          <div class="section-head">
+            <div>
+              <h2>操作人员登录</h2>
+              <p>确认现场操作者身份、权限和登录时间，后续任务、材料、工艺、过程数据均关联到该人员。</p>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" id="scanBadgeBtn">模拟刷卡</button>
+              <button class="btn primary" id="loginBtn">确认登录</button>
+            </div>
+          </div>
+          <div class="grid cols-2">
+            <div class="panel">
+              <div class="panel-head"><h3>身份信息</h3><span class="status yellow" id="loginState">未登录</span></div>
+              <div class="panel-body form-grid">
+                <div class="field">
+                  <label>工号</label>
+                  <input id="operatorNo" value="OP-1027" />
+                </div>
+                <div class="field">
+                  <label>姓名</label>
+                  <input id="operatorName" value="张工" />
+                </div>
+                <div class="field">
+                  <label>班组</label>
+                  <input value="焊接一班" />
+                </div>
+                <div class="field">
+                  <label>权限</label>
+                  <select id="operatorRole">
+                    <option>操作员</option>
+                    <option>检查员</option>
+                    <option>班组长</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>登录结果</h3><span class="status blue">人机料法追溯起点</span></div>
+              <div class="panel-body">
+                <div class="flow-line">
+                  <div class="flow-card"><strong>人员</strong><span id="loginOperator">待确认</span></div>
+                  <div class="flow-card"><strong>设备</strong><span>RBT-06</span></div>
+                  <div class="flow-card"><strong>班次</strong><span>白班</span></div>
+                  <div class="flow-card"><strong>权限</strong><span id="loginRoleSummary">任务执行</span></div>
+                  <div class="flow-card"><strong>时间</strong><span id="loginTime">待生成</span></div>
+                </div>
+                <div class="step-footer">
+                  <button class="btn primary" id="loginNextBtn" data-nav="precheck">进入工控机自检</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="view-precheck">
+          <div class="section-head">
+            <div>
+              <h2>工控机自检</h2>
+              <p>启动后确认机器人、焊机、气瓶、扫码设备和采集链路是否满足当前作业要求。</p>
+            </div>
+            <div class="actions">
+              <button class="btn primary" id="runPrecheckBtn">一键自检</button>
+              <button class="btn bad" id="failPrecheckBtn">模拟异常</button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>自检项目</h3><span class="status yellow" id="precheckOverall">待自检</span></div>
+            <div class="panel-body equipment-list" id="precheckRows"></div>
+          </div>
+          <div class="step-footer">
+            <button class="btn primary" data-nav="material">下一步：焊接材料录入</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-material">
+          <div class="section-head">
+            <div>
+              <h2>焊接材料录入</h2>
+              <p>通过扫码或人工确认建立焊丝、气体、气瓶与当前任务的材料追溯关系。</p>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" id="scanWireBtn">扫描焊丝</button>
+              <button class="btn ghost" id="scanGasBtn">扫描气瓶</button>
+              <button class="btn primary" id="confirmMaterialBtn">确认材料</button>
+            </div>
+          </div>
+          <div class="grid cols-2">
+            <div class="panel">
+              <div class="panel-head"><h3>焊材与气体</h3><span class="status yellow" id="materialState">待确认</span></div>
+              <div class="panel-body form-grid">
+                <div class="field">
+                  <label>焊丝型号</label>
+                  <input id="wireType" value="ER50-6 1.2mm" />
+                </div>
+                <div class="field">
+                  <label>焊丝批次</label>
+                  <input id="wireBatch" value="WIRE-260512-A01" />
+                </div>
+                <div class="field">
+                  <label>气体类型</label>
+                  <input id="gasType" value="Ar+CO2 80/20" />
+                </div>
+                <div class="field">
+                  <label>气瓶编号</label>
+                  <input id="gasBottle" value="GAS-A12-0588" />
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>匹配提示</h3><span class="status green">符合推荐</span></div>
+              <div class="panel-body process-values">
+                <div class="value-row"><span>推荐焊丝</span><strong>ER50-6</strong></div>
+                <div class="value-row"><span>推荐气体</span><strong>Ar+CO2</strong></div>
+                <div class="value-row"><span>领用时间</span><strong id="materialTime">待确认</strong></div>
+                <div class="value-row"><span>材料状态</span><strong id="materialSummary">未绑定</strong></div>
+              </div>
+            </div>
+          </div>
+          <div class="step-footer">
+            <button class="btn primary" data-nav="workpiece">下一步：工件信息确认</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-workpiece">
+          <div class="section-head">
+            <div>
+              <h2>工件信息确认</h2>
+              <p>确认本次焊接工件、订单、项目、区域与材质，为焊缝任务和追溯链路提供工件上下文。</p>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" id="scanWorkpieceBtn">扫描工件</button>
+              <button class="btn primary" id="confirmWorkpieceBtn">确认工件</button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>工件信息</h3><span class="status yellow" id="workpieceState">待确认</span></div>
+            <div class="panel-body form-grid">
+              <div class="field">
+                <label>工件编号</label>
+                <input id="workpieceNo" value="WP-A3-BLOCK-009" />
+              </div>
+              <div class="field">
+                <label>项目号</label>
+                <input id="projectNo" value="SHIP-2026-118" />
+              </div>
+              <div class="field">
+                <label>订单号</label>
+                <input id="orderNo" value="ORD-2605-031" />
+              </div>
+              <div class="field">
+                <label>区域</label>
+                <input id="areaNo" value="A3 船体分段" />
+              </div>
+              <div class="field">
+                <label>材质</label>
+                <input id="materialGrade" value="Q355B" />
+              </div>
+              <div class="field">
+                <label>分段 / 模块</label>
+                <input id="blockNo" value="BLOCK-A3-09" />
+              </div>
+            </div>
+          </div>
+          <div class="step-footer">
+            <button class="btn primary" data-nav="task">下一步：焊缝任务确认</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-task">
+          <div class="section-head">
+            <div>
+              <h2>焊缝任务确认</h2>
+              <p>从客户侧导入的焊缝任务清单中选择当前要执行的任务，确认焊缝编号、类型、板厚、位置和状态。</p>
+            </div>
+            <div class="actions">
+              <button class="btn primary" id="confirmTaskBtn">确认选中任务</button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>任务清单</h3><span class="status blue" id="selectedTaskLabel">默认选中 W-A3-018</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>任务号</th>
+                    <th>焊缝编号</th>
+                    <th>区域</th>
+                    <th>焊缝类型</th>
+                    <th>位置</th>
+                    <th>板厚</th>
+                    <th>材质</th>
+                    <th>理论长度</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="taskRows"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="step-footer">
+            <button class="btn primary" data-nav="process">下一步：工艺确认</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-process">
+          <div class="section-head">
+            <div>
+              <h2>工艺确认</h2>
+              <p>根据焊缝类型、材质和板厚匹配推荐工艺；现场允许微调，但实际设定值必须写入焊接记录。</p>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" id="loadProcessBtn">匹配推荐工艺</button>
+              <button class="btn primary" id="confirmProcessBtn">确认实际参数</button>
+            </div>
+          </div>
+          <div class="grid cols-2">
+            <div class="panel">
+              <div class="panel-head"><h3>推荐工艺</h3><span class="status green">P-WELD-FILLET-08 v3.2</span></div>
+              <div class="panel-body process-values">
+                <div class="value-row"><span>适用焊缝</span><strong>角焊缝</strong></div>
+                <div class="value-row"><span>板厚范围</span><strong>8-12 mm</strong></div>
+                <div class="value-row"><span>推荐电流</span><strong>185 A</strong></div>
+                <div class="value-row"><span>推荐电压</span><strong>24.5 V</strong></div>
+                <div class="value-row"><span>推荐速度</span><strong>360 mm/min</strong></div>
+                <div class="value-row"><span>起弧模式</span><strong>DC_SYNERGIC</strong></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>实际使用参数</h3><span class="status yellow" id="processState">待确认</span></div>
+              <div class="panel-body form-grid">
+                <div class="field">
+                  <label>设定电流 A</label>
+                  <input id="actualCurrent" type="number" value="188" />
+                </div>
+                <div class="field">
+                  <label>设定电压 V</label>
+                  <input id="actualVoltage" type="number" step="0.1" value="25.1" />
+                </div>
+                <div class="field">
+                  <label>设定速度 mm/min</label>
+                  <input id="actualSpeed" type="number" value="355" />
+                </div>
+                <div class="field">
+                  <label>机器人程序号</label>
+                  <input id="programNo" value="JOB-A3-FILLET-018" />
+                </div>
+                <div class="field" style="grid-column:1/-1;">
+                  <label>调整说明</label>
+                  <textarea id="processNote">现场坡口间隙略大，电压上调 0.6V。</textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-footer">
+            <button class="btn primary" data-nav="welding">下一步：机器人焊接</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-welding">
+          <div class="section-head">
+            <div>
+              <h2>机器人焊接</h2>
+              <p>操作人员使用机器人完成焊接，系统采集机器人编号、程序号、电流、电压、焊接时间、长度和报警。</p>
+            </div>
+            <div class="actions">
+              <button class="btn good" id="startWeldingBtn">开始焊接</button>
+              <button class="btn warn" id="pauseWeldingBtn">暂停</button>
+              <button class="btn primary" id="finishWeldingBtn">完成焊接</button>
+            </div>
+          </div>
+          <div class="weld-stage">
+            <div class="panel">
+              <div class="panel-head"><h3>现场执行</h3><span class="status yellow" id="weldingState">待开始</span></div>
+              <div class="panel-body">
+                <div class="robot-visual" id="robotVisual">
+                  <div class="robot-base"></div>
+                  <div class="robot-arm-a"></div>
+                  <div class="robot-arm-b"></div>
+                  <div class="robot-torch"></div>
+                  <div class="workpiece"></div>
+                  <div class="arc"></div>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>过程采集</h3><span class="status blue" id="recordNo">REC-待生成</span></div>
+              <div class="panel-body process-values">
+                <div class="value-row"><span>任务号</span><strong id="weldingTaskNo">TASK-260512-018</strong></div>
+                <div class="value-row"><span>程序号</span><strong id="weldingProgramNo">JOB-A3-FILLET-018</strong></div>
+                <div class="value-row"><span>平均电流</span><strong id="avgCurrent">0 A</strong></div>
+                <div class="value-row"><span>平均电压</span><strong id="avgVoltage">0 V</strong></div>
+                <div class="value-row"><span>焊接时间</span><strong id="weldTime">0 s</strong></div>
+                <div class="value-row"><span>实际长度</span><strong id="actualLength">0 mm</strong></div>
+                <div class="value-row"><span>报警码</span><strong id="alarmCode">无</strong></div>
+              </div>
+            </div>
+          </div>
+          <div class="step-footer">
+            <button class="btn primary" data-nav="inspection">下一步：焊缝检查</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-inspection">
+          <div class="section-head">
+            <div>
+              <h2>焊缝检查</h2>
+              <p>检查人员确认焊缝尺寸、外观、缺陷、附件和最终结果，形成焊后质量记录。</p>
+            </div>
+            <div class="actions">
+              <button class="btn good" id="inspectionOkBtn">判定 OK</button>
+              <button class="btn bad" id="inspectionNgBtn">判定 NG</button>
+            </div>
+          </div>
+          <div class="grid cols-2">
+            <div class="panel">
+              <div class="panel-head"><h3>检查录入</h3><span class="status yellow" id="inspectionState">待检查</span></div>
+              <div class="panel-body form-grid">
+                <div class="field">
+                  <label>检查人员</label>
+                  <input id="inspectorNo" value="QC-031 李检" />
+                </div>
+                <div class="field">
+                  <label>焊脚尺寸 mm</label>
+                  <input id="weldSize" type="number" step="0.1" value="8.2" />
+                </div>
+                <div class="field">
+                  <label>外观结果</label>
+                  <select id="appearanceResult">
+                    <option>成形均匀</option>
+                    <option>咬边</option>
+                    <option>气孔</option>
+                    <option>焊瘤</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>缺陷类型</label>
+                  <select id="defectType">
+                    <option>无</option>
+                    <option>气孔</option>
+                    <option>裂纹</option>
+                    <option>未焊透</option>
+                  </select>
+                </div>
+                <div class="field" style="grid-column:1/-1;">
+                  <label>附件</label>
+                  <input id="attachmentUrls" value="photo/W-A3-018-front.jpg, report/W-A3-018.pdf" />
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>检查结论</h3><span class="status blue" id="finalResult">待确认</span></div>
+              <div class="panel-body trace-grid">
+                <div class="trace-item"><span>焊缝编号</span><strong id="inspectWeldNo">W-A3-018</strong></div>
+                <div class="trace-item"><span>检查时间</span><strong id="inspectionTime">待生成</strong></div>
+                <div class="trace-item"><span>最终结果</span><strong id="inspectionFinalText">待确认</strong></div>
+                <div class="trace-item"><span>流转状态</span><strong id="inspectionNextState">待检查</strong></div>
+                <div class="trace-item"><span>附件状态</span><strong>2 个附件</strong></div>
+                <div class="trace-item"><span>闭环记录</span><strong id="closureState">未闭环</strong></div>
+              </div>
+            </div>
+          </div>
+          <div class="step-footer">
+            <button class="btn ghost" data-nav="trace">查看焊缝追溯</button>
+            <button class="btn primary" data-nav="bi">下一步：BI 看板</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-trace">
+          <div class="section-head">
+            <div>
+              <h2>焊缝质量追溯</h2>
+              <p>按焊缝编号串联人、机、料、法、工件、过程参数和检查结果，支持质量追溯与客户审计。</p>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" id="refreshTraceBtn">刷新追溯</button>
+              <button class="btn primary" data-nav="bi">查看 BI</button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3 id="traceTitle">W-A3-018 追溯链</h3><span class="status green" id="traceState">数据完整</span></div>
+            <div class="panel-body trace-grid">
+              <div class="trace-item"><span>操作人员</span><strong id="traceOperator">未登录</strong></div>
+              <div class="trace-item"><span>机器人 / 焊机</span><strong>RBT-06 / WLD-350</strong></div>
+              <div class="trace-item"><span>工件</span><strong id="traceWorkpiece">WP-A3-BLOCK-009</strong></div>
+              <div class="trace-item"><span>项目 / 订单</span><strong id="traceProject">SHIP-2026-118 / ORD-2605-031</strong></div>
+              <div class="trace-item"><span>焊丝</span><strong id="traceWire">ER50-6 1.2mm / WIRE-260512-A01</strong></div>
+              <div class="trace-item"><span>气体</span><strong id="traceGas">Ar+CO2 80/20 / GAS-A12-0588</strong></div>
+              <div class="trace-item"><span>工艺版本</span><strong>P-WELD-FILLET-08 v3.2</strong></div>
+              <div class="trace-item"><span>实际参数</span><strong id="traceProcess">188A / 25.1V / 355mm/min</strong></div>
+              <div class="trace-item"><span>过程记录</span><strong id="traceRecord">待焊接</strong></div>
+              <div class="trace-item"><span>检查结果</span><strong id="traceInspection">待检查</strong></div>
+              <div class="trace-item"><span>附件</span><strong>photo/W-A3-018-front.jpg</strong></div>
+              <div class="trace-item"><span>状态</span><strong id="traceTaskStatus">焊前确认</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="view-bi">
+          <div class="section-head">
+            <div>
+              <h2>BI 分析看板</h2>
+              <p>从机器人侧 MES 记录读取任务、材料、工艺、过程和检查数据，输出进度、效率、质量、报警和工艺符合分析。</p>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" data-nav="dashboard">返回工作台</button>
+              <button class="btn primary" id="refreshBiBtn">刷新数据</button>
+            </div>
+          </div>
+          <div class="grid cols-4">
+            <div class="panel metric"><span>区域完成率</span><strong>72%</strong><small>A3 区域领先</small></div>
+            <div class="panel metric"><span>机器人作业量</span><strong>428m</strong><small>今日焊接长度</small></div>
+            <div class="panel metric"><span>工艺符合率</span><strong id="processFitRate">91%</strong><small>偏差任务 4 个</small></div>
+            <div class="panel metric"><span>报警次数</span><strong>7</strong><small>较昨日下降 3 次</small></div>
+          </div>
+          <div class="chart-grid" style="margin-top:14px;">
+            <div class="panel">
+              <div class="panel-head"><h3>区域焊接进度</h3><span class="status blue">任务表</span></div>
+              <div class="panel-body chart-bars">
+                <div class="chart-row"><span>A3 分段</span><div class="bar green"><span style="width:78%"></span></div><strong>78%</strong></div>
+                <div class="chart-row"><span>B1 分段</span><div class="bar"><span style="width:62%"></span></div><strong>62%</strong></div>
+                <div class="chart-row"><span>C2 分段</span><div class="bar yellow"><span style="width:45%"></span></div><strong>45%</strong></div>
+                <div class="chart-row"><span>D4 分段</span><div class="bar red"><span style="width:28%"></span></div><strong>28%</strong></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>焊缝质量结果</h3><span class="status green">检查表</span></div>
+              <div class="panel-body">
+                <div class="donut"></div>
+              </div>
+            </div>
+          </div>
+          <div class="grid cols-2" style="margin-top:14px;">
+            <div class="panel">
+              <div class="panel-head"><h3>机器人作业量</h3><span class="status blue">焊接过程表</span></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>机器人</th><th>任务数</th><th>焊接长度</th><th>焊接时间</th><th>利用率</th></tr></thead>
+                  <tbody>
+                    <tr><td>RBT-06</td><td>18</td><td>152m</td><td>5.6h</td><td>82%</td></tr>
+                    <tr><td>RBT-03</td><td>14</td><td>119m</td><td>4.8h</td><td>76%</td></tr>
+                    <tr><td>RBT-08</td><td>11</td><td>91m</td><td>3.9h</td><td>69%</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>报警统计</h3><span class="status red">控制器 / 焊机</span></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>报警类型</th><th>次数</th><th>关联任务</th><th>处理建议</th></tr></thead>
+                  <tbody>
+                    <tr><td>电弧中断</td><td>3</td><td>W-A3-011</td><td>检查焊丝送丝</td></tr>
+                    <tr><td>电压偏差</td><td>2</td><td>W-A3-018</td><td>复核工艺设定</td></tr>
+                    <tr><td>气压不足</td><td>2</td><td>W-B1-006</td><td>检查气瓶余量</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const steps = [
+      ["dashboard", "工作台", "今日任务与快捷入口"],
+      ["login", "人员登录", "工号、权限、班次"],
+      ["precheck", "工控机自检", "机器人、焊机、气瓶"],
+      ["material", "焊材录入", "焊丝、气体、批次"],
+      ["workpiece", "工件确认", "项目、订单、区域"],
+      ["task", "任务确认", "焊缝编号与状态"],
+      ["process", "工艺确认", "推荐与实际参数"],
+      ["welding", "机器人焊接", "过程采集与报警"],
+      ["inspection", "焊缝检查", "OK/NG 与附件"],
+      ["trace", "追溯", "人机料法环"],
+      ["bi", "BI 看板", "进度、效率、质量"]
+    ];
+
+    const state = {
+      active: "dashboard",
+      completed: new Set(),
+      selectedTask: "TASK-260512-018",
+      operator: "未登录",
+      taskStatus: "待开工",
+      isWelding: false,
+      weldSeconds: 0,
+      weldTimer: null,
+      finalInspection: "待确认"
+    };
+
+    const tasks = [
+      { id: "TASK-260512-018", weld: "W-A3-018", project: "SHIP-2026-118", order: "ORD-2605-031", area: "A3", type: "角焊缝", position: "甲板纵骨 L12", thickness: "10mm", material: "Q355B", length: 1260, status: "待开工" },
+      { id: "TASK-260512-019", weld: "W-A3-019", project: "SHIP-2026-118", order: "ORD-2605-031", area: "A3", type: "角焊缝", position: "甲板纵骨 L13", thickness: "10mm", material: "Q355B", length: 1180, status: "待开工" },
+      { id: "TASK-260512-020", weld: "W-A3-020", project: "SHIP-2026-118", order: "ORD-2605-031", area: "A3", type: "对接焊缝", position: "腹板拼接 P02", thickness: "12mm", material: "Q355B", length: 880, status: "待开工" },
+      { id: "TASK-260512-006", weld: "W-B1-006", project: "STEEL-2026-071", order: "ORD-2605-022", area: "B1", type: "角焊缝", position: "柱脚连接 C04", thickness: "8mm", material: "Q235B", length: 760, status: "待检查" }
+    ];
+
+    const precheckItems = [
+      ["机器人控制器", "RBT-06 在线，伺服准备完成", "待自检"],
+      ["焊机采集", "WLD-350 电流/电压通道", "待自检"],
+      ["气瓶状态", "气压、气体类型、气瓶编号", "待自检"],
+      ["扫码设备", "工件、焊材、人员码读取", "待自检"],
+      ["网络与数据库", "本地缓存与上传队列", "待自检"]
+    ];
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function nowText() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+
+    function statusClass(status) {
+      if (["已完成", "PASS", "OK", "正常", "已确认", "数据完整"].includes(status)) return "green";
+      if (["焊接中", "进行中", "已登录"].includes(status)) return "blue";
+      if (["FAIL", "NG", "报警", "异常"].includes(status)) return "red";
+      return "yellow";
+    }
+
+    function roleTarget(role) {
+      const routes = {
+        "操作员": { nav: "precheck", label: "进入工控机自检", summary: "任务执行" },
+        "检查员": { nav: "inspection", label: "进入焊缝检查", summary: "质量检查" },
+        "班组长": { nav: "bi", label: "进入 BI 看板", summary: "班组管理" }
+      };
+      return routes[role] || routes["操作员"];
+    }
+
+    function syncRoleLanding() {
+      const role = $("operatorRole").value;
+      const target = roleTarget(role);
+      $("loginRoleSummary").textContent = target.summary;
+      $("loginNextBtn").textContent = target.label;
+      $("loginNextBtn").dataset.nav = target.nav;
+    }
+
+    function toast(text) {
+      const el = $("toast");
+      el.textContent = text;
+      el.classList.add("show");
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function buildNav() {
+      const nav = $("navList");
+      nav.innerHTML = steps.map((step, index) => {
+        const [id, label, desc] = step;
+        const done = state.completed.has(id);
+        const active = state.active === id;
+        const cls = active ? "current" : done ? "done" : "";
+        return `
+          <button class="nav-item ${active ? "active" : ""}" data-nav="${id}">
+            <span class="nav-index">${index + 1}</span>
+            <span class="nav-label"><strong>${label}</strong><span>${desc}</span></span>
+            <span class="nav-state ${cls}"></span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function navigate(id) {
+      state.active = id;
+      document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
+      const next = $(`view-${id}`);
+      if (next) next.classList.add("active");
+      buildNav();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function selectedTask() {
+      return tasks.find(task => task.id === state.selectedTask) || tasks[0];
+    }
+
+    function renderTaskRows() {
+      const dashboardRows = $("dashboardTaskRows");
+      dashboardRows.innerHTML = tasks.map(task => `
+        <tr class="selectable ${task.id === state.selectedTask ? "selected" : ""}" data-task="${task.id}" data-nav="task">
+          <td>${task.id}</td>
+          <td><strong>${task.weld}</strong></td>
+          <td>${task.project} / ${task.order}</td>
+          <td>${task.area}</td>
+          <td>${task.type}</td>
+          <td>${task.thickness}</td>
+          <td>${task.length} mm</td>
+          <td><span class="status ${statusClass(task.status)}">${task.status}</span></td>
+        </tr>
+      `).join("");
+
+      const taskRows = $("taskRows");
+      taskRows.innerHTML = tasks.map(task => `
+        <tr class="selectable ${task.id === state.selectedTask ? "selected" : ""}" data-task="${task.id}">
+          <td>${task.id}</td>
+          <td><strong>${task.weld}</strong></td>
+          <td>${task.area}</td>
+          <td>${task.type}</td>
+          <td>${task.position}</td>
+          <td>${task.thickness}</td>
+          <td>${task.material}</td>
+          <td>${task.length} mm</td>
+          <td><span class="status ${statusClass(task.status)}">${task.status}</span></td>
+        </tr>
+      `).join("");
+
+      const task = selectedTask();
+      $("selectedTaskLabel").textContent = `当前选中 ${task.weld}`;
+      $("weldingTaskNo").textContent = task.id;
+      $("inspectWeldNo").textContent = task.weld;
+      $("traceTitle").textContent = `${task.weld} 追溯链`;
+      $("traceTaskStatus").textContent = task.status;
+      $("topTaskText").textContent = `当前任务${task.status}`;
+      $("topTaskDot").className = `dot ${task.status === "焊接中" ? "warn" : task.status === "已完成" ? "good" : ""}`;
+      $("metricPending").textContent = String(18 - tasks.filter(t => t.status === "已完成").length);
+      $("metricRunning").textContent = String(tasks.filter(t => t.status === "焊接中").length);
+      $("metricRunningNote").textContent = task.status === "焊接中" ? `${task.weld} 正在采集过程数据` : "暂无焊接任务";
+      $("metricInspect").textContent = String(6 + tasks.filter(t => t.status === "待检查").length - 1);
+    }
+
+    function renderPrecheck(statuses = precheckItems.map(item => item[2])) {
+      $("precheckRows").innerHTML = precheckItems.map((item, index) => {
+        const status = statuses[index];
+        return `
+          <div class="equipment-row">
+            <div><strong>${item[0]}</strong><span>${item[1]}</span></div>
+            <span class="status ${statusClass(status)}">${status}</span>
+            <button class="btn ghost" data-precheck-index="${index}">切换</button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function complete(id) {
+      state.completed.add(id);
+      buildNav();
+    }
+
+    function updateTrace() {
+      const task = selectedTask();
+      $("traceOperator").textContent = state.operator;
+      $("traceWorkpiece").textContent = $("workpieceNo").value;
+      $("traceProject").textContent = `${$("projectNo").value} / ${$("orderNo").value}`;
+      $("traceWire").textContent = `${$("wireType").value} / ${$("wireBatch").value}`;
+      $("traceGas").textContent = `${$("gasType").value} / ${$("gasBottle").value}`;
+      $("traceProcess").textContent = `${$("actualCurrent").value}A / ${$("actualVoltage").value}V / ${$("actualSpeed").value}mm/min`;
+      $("traceRecord").textContent = task.status === "待开工" ? "待焊接" : `${$("recordNo").textContent} / ${$("weldTime").textContent}`;
+      $("traceInspection").textContent = state.finalInspection;
+      $("traceTaskStatus").textContent = task.status;
+      $("traceState").textContent = task.status === "已完成" ? "数据完整" : "持续记录中";
+      $("traceState").className = `status ${task.status === "已完成" ? "green" : "blue"}`;
+    }
+
+    function setTaskStatus(status) {
+      const task = selectedTask();
+      task.status = status;
+      state.taskStatus = status;
+      renderTaskRows();
+      updateTrace();
+    }
+
+    function stopWeldingTimer() {
+      if (state.weldTimer) {
+        clearInterval(state.weldTimer);
+        state.weldTimer = null;
+      }
+    }
+
+    function updateWeldMetrics() {
+      const current = Number($("actualCurrent").value || 188);
+      const voltage = Number($("actualVoltage").value || 25.1);
+      $("avgCurrent").textContent = `${Math.round(current - 3 + Math.random() * 5)} A`;
+      $("avgVoltage").textContent = `${(voltage - 0.4 + Math.random() * 0.8).toFixed(1)} V`;
+      $("weldTime").textContent = `${state.weldSeconds} s`;
+      $("actualLength").textContent = `${Math.min(selectedTask().length, Math.round(state.weldSeconds * 18))} mm`;
+    }
+
+    document.addEventListener("click", event => {
+      const navTarget = event.target.closest("[data-nav]");
+      if (navTarget) {
+        const taskRow = event.target.closest("[data-task]");
+        if (taskRow) state.selectedTask = taskRow.dataset.task;
+        renderTaskRows();
+        navigate(navTarget.dataset.nav);
+        return;
+      }
+
+      const taskRow = event.target.closest("[data-task]");
+      if (taskRow) {
+        state.selectedTask = taskRow.dataset.task;
+        renderTaskRows();
+        toast(`已选择任务 ${selectedTask().weld}`);
+        return;
+      }
+
+      const precheckBtn = event.target.closest("[data-precheck-index]");
+      if (precheckBtn) {
+        const row = precheckBtn.closest(".equipment-row");
+        const badge = row.querySelector(".status");
+        const next = badge.textContent === "PASS" ? "待自检" : "PASS";
+        badge.textContent = next;
+        badge.className = `status ${statusClass(next)}`;
+      }
+    });
+
+    $("scanBadgeBtn").addEventListener("click", () => {
+      $("operatorNo").value = "OP-1027";
+      $("operatorName").value = "张工";
+      toast("已读取人员卡 OP-1027");
+    });
+
+    $("operatorRole").addEventListener("change", syncRoleLanding);
+
+    $("loginBtn").addEventListener("click", () => {
+      const role = $("operatorRole").value;
+      const target = roleTarget(role);
+      state.operator = `${$("operatorNo").value} ${$("operatorName").value}`;
+      $("topOperator").textContent = state.operator;
+      $("loginOperator").textContent = state.operator;
+      $("loginRoleSummary").textContent = target.summary;
+      $("loginTime").textContent = nowText();
+      $("loginState").textContent = "已登录";
+      $("loginState").className = "status blue";
+      complete("login");
+      updateTrace();
+      navigate(target.nav);
+      toast(`${role}已登录，已进入${target.label.replace("进入 ", "")}`);
+    });
+
+    $("runPrecheckBtn").addEventListener("click", () => {
+      renderPrecheck(["PASS", "PASS", "PASS", "PASS", "PASS"]);
+      $("precheckOverall").textContent = "PASS";
+      $("precheckOverall").className = "status green";
+      $("dashboardPrecheck").textContent = "PASS";
+      $("dashboardPrecheck").className = "status green";
+      $("welderStatus").textContent = "正常";
+      $("welderStatus").className = "status green";
+      complete("precheck");
+      toast("工控机自检通过");
+    });
+
+    $("failPrecheckBtn").addEventListener("click", () => {
+      renderPrecheck(["PASS", "FAIL", "PASS", "PASS", "PASS"]);
+      $("precheckOverall").textContent = "FAIL";
+      $("precheckOverall").className = "status red";
+      $("topRobotDot").className = "dot bad";
+      $("topRobotText").textContent = "焊机采集异常";
+      toast("已模拟焊机采集异常");
+    });
+
+    $("scanWireBtn").addEventListener("click", () => {
+      $("wireBatch").value = "WIRE-260512-A01";
+      toast("已扫描焊丝批次");
+    });
+
+    $("scanGasBtn").addEventListener("click", () => {
+      $("gasBottle").value = "GAS-A12-0588";
+      toast("已扫描气瓶二维码");
+    });
+
+    $("confirmMaterialBtn").addEventListener("click", () => {
+      $("materialState").textContent = "已确认";
+      $("materialState").className = "status green";
+      $("materialTime").textContent = nowText();
+      $("materialSummary").textContent = "已绑定当前任务";
+      complete("material");
+      updateTrace();
+      toast("焊接材料已确认");
+    });
+
+    $("scanWorkpieceBtn").addEventListener("click", () => {
+      $("workpieceNo").value = "WP-A3-BLOCK-009";
+      toast("已读取工件二维码");
+    });
+
+    $("confirmWorkpieceBtn").addEventListener("click", () => {
+      $("workpieceState").textContent = "已确认";
+      $("workpieceState").className = "status green";
+      complete("workpiece");
+      updateTrace();
+      toast("工件信息已确认");
+    });
+
+    $("confirmTaskBtn").addEventListener("click", () => {
+      setTaskStatus("焊前确认");
+      complete("task");
+      toast(`任务 ${selectedTask().weld} 已确认`);
+    });
+
+    $("loadProcessBtn").addEventListener("click", () => {
+      $("actualCurrent").value = "185";
+      $("actualVoltage").value = "24.5";
+      $("actualSpeed").value = "360";
+      $("processNote").value = "使用推荐工艺参数。";
+      toast("已匹配推荐工艺");
+    });
+
+    $("confirmProcessBtn").addEventListener("click", () => {
+      $("processState").textContent = "已确认";
+      $("processState").className = "status green";
+      $("weldingProgramNo").textContent = $("programNo").value;
+      complete("process");
+      updateTrace();
+      toast("实际工艺参数已记录");
+    });
+
+    $("startWeldingBtn").addEventListener("click", () => {
+      stopWeldingTimer();
+      state.isWelding = true;
+      state.weldSeconds = Math.max(state.weldSeconds, 1);
+      $("robotVisual").classList.add("is-welding");
+      $("weldingState").textContent = "焊接中";
+      $("weldingState").className = "status blue";
+      $("recordNo").textContent = "REC-260512-018";
+      setTaskStatus("焊接中");
+      complete("welding");
+      state.weldTimer = setInterval(() => {
+        state.weldSeconds += 1;
+        updateWeldMetrics();
+      }, 1000);
+      updateWeldMetrics();
+      toast("机器人焊接已开始");
+    });
+
+    $("pauseWeldingBtn").addEventListener("click", () => {
+      stopWeldingTimer();
+      state.isWelding = false;
+      $("robotVisual").classList.remove("is-welding");
+      $("weldingState").textContent = "暂停";
+      $("weldingState").className = "status yellow";
+      toast("焊接已暂停");
+    });
+
+    $("finishWeldingBtn").addEventListener("click", () => {
+      stopWeldingTimer();
+      state.isWelding = false;
+      state.weldSeconds = Math.max(state.weldSeconds, 72);
+      $("robotVisual").classList.remove("is-welding");
+      $("weldingState").textContent = "已完成";
+      $("weldingState").className = "status green";
+      $("alarmCode").textContent = "无";
+      updateWeldMetrics();
+      setTaskStatus("待检查");
+      toast("焊接完成，任务流转到待检查");
+    });
+
+    $("inspectionOkBtn").addEventListener("click", () => {
+      state.finalInspection = "OK";
+      $("inspectionState").textContent = "OK";
+      $("inspectionState").className = "status green";
+      $("finalResult").textContent = "OK";
+      $("finalResult").className = "status green";
+      $("inspectionFinalText").textContent = "OK";
+      $("inspectionNextState").textContent = "已完成";
+      $("closureState").textContent = "已闭环";
+      $("inspectionTime").textContent = nowText();
+      setTaskStatus("已完成");
+      complete("inspection");
+      updateTrace();
+      toast("检查结果 OK，任务已闭环");
+    });
+
+    $("inspectionNgBtn").addEventListener("click", () => {
+      state.finalInspection = "NG";
+      $("inspectionState").textContent = "NG";
+      $("inspectionState").className = "status red";
+      $("finalResult").textContent = "NG";
+      $("finalResult").className = "status red";
+      $("inspectionFinalText").textContent = "NG";
+      $("inspectionNextState").textContent = "返修待处理";
+      $("closureState").textContent = "未闭环";
+      $("inspectionTime").textContent = nowText();
+      $("defectType").value = "气孔";
+      setTaskStatus("返修");
+      complete("inspection");
+      updateTrace();
+      toast("检查结果 NG，已标记返修");
+    });
+
+    $("refreshTraceBtn").addEventListener("click", () => {
+      updateTrace();
+      toast("追溯链已刷新");
+    });
+
+    $("refreshBiBtn").addEventListener("click", () => {
+      $("processFitRate").textContent = state.finalInspection === "OK" ? "93%" : "89%";
+      toast("BI 数据已按当前原型状态刷新");
+    });
+
+    buildNav();
+    renderTaskRows();
+    renderPrecheck();
+    updateTrace();
+    syncRoleLanding();
+  </script>
+</body>
+</html>
