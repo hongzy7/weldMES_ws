@@ -780,20 +780,6 @@
       background: #fff;
     }
 
-    .plugin-frame-note {
-      position: absolute;
-      left: 14px;
-      bottom: 14px;
-      padding: 5px 8px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--blue);
-      font-size: 12px;
-      font-weight: 800;
-      box-shadow: var(--shadow);
-      pointer-events: none;
-    }
-
     .plugin-window.is-active {
       border-color: rgba(22, 105, 224, 0.55);
       box-shadow: 0 0 0 3px rgba(22, 105, 224, 0.12);
@@ -1431,7 +1417,6 @@
                       scrolling="no"
                       loading="eager"
                     ></iframe>
-                    <div class="plugin-frame-note" id="pluginFrameNote">WeldPlus 插件嵌入窗口</div>
                   </div>
                 </div>
               </div>
@@ -1441,8 +1426,8 @@
               <div class="panel-body process-values">
                 <div class="value-row"><span>任务号</span><strong id="weldingTaskNo">TASK-260512-018</strong></div>
                 <div class="value-row"><span>程序号</span><strong id="weldingProgramNo">JOB-A3-FILLET-018</strong></div>
-                <div class="value-row"><span>平均电流</span><strong id="avgCurrent">0 A</strong></div>
-                <div class="value-row"><span>平均电压</span><strong id="avgVoltage">0 V</strong></div>
+                <div class="value-row"><span>实时电流</span><strong id="avgCurrent">-- A</strong></div>
+                <div class="value-row"><span>实时电压</span><strong id="avgVoltage">-- V</strong></div>
                 <div class="value-row"><span>焊接时间</span><strong id="weldTime">0 s</strong></div>
                 <div class="value-row"><span>实际长度</span><strong id="actualLength">0 mm</strong></div>
                 <div class="value-row"><span>报警码</span><strong id="alarmCode">无</strong></div>
@@ -1641,6 +1626,8 @@
       isWelding: false,
       weldSeconds: 0,
       weldTimer: null,
+      robotDataTimer: null,
+      lastRobotSample: null,
       finalInspection: "待确认"
     };
 
@@ -1823,13 +1810,23 @@
       }
     }
 
+    function stopRobotDataTimer() {
+      if (state.robotDataTimer) {
+        clearInterval(state.robotDataTimer);
+        state.robotDataTimer = null;
+      }
+    }
+
     function updateWeldMetrics() {
-      const current = Number($("actualCurrent").value || 188);
-      const voltage = Number($("actualVoltage").value || 25.1);
-      $("avgCurrent").textContent = `${Math.round(current - 3 + Math.random() * 5)} A`;
-      $("avgVoltage").textContent = `${(voltage - 0.4 + Math.random() * 0.8).toFixed(1)} V`;
+      const sample = state.lastRobotSample;
+      const current = sample?.realtime_current_a;
+      const voltage = sample?.realtime_voltage_v;
+      const length = sample?.tcp_length_mm;
+      $("avgCurrent").textContent = Number.isFinite(current) ? `${current.toFixed(1)} A` : "-- A";
+      $("avgVoltage").textContent = Number.isFinite(voltage) ? `${voltage.toFixed(1)} V` : "-- V";
       $("weldTime").textContent = `${state.weldSeconds} s`;
-      $("actualLength").textContent = `${Math.min(selectedTask().length, Math.round(state.weldSeconds * 18))} mm`;
+      $("actualLength").textContent = Number.isFinite(length) ? `${Math.round(length)} mm` : "-- mm";
+      $("alarmCode").textContent = sample?.alarm_code || sample?.weld_error_code || "无";
     }
 
     function updateRobotActionButtons() {
@@ -1847,7 +1844,6 @@
       $("dashboardRobotText").textContent = connected ? `控制器 ${robotIp()} 在线，插件窗口已连接` : "等待连接机器人控制器";
       $("dashboardRobotStatus").textContent = connected ? "已连接" : "未连接";
       $("dashboardRobotStatus").className = `status ${connected ? "green" : "red"}`;
-      $("pluginFrameNote").textContent = connected ? "WeldPlus 插件嵌入窗口" : (message || "未连接：请检查机器人 IP / 网段");
       updateRobotActionButtons();
     }
 
@@ -1866,24 +1862,57 @@
       return `http://${robotIp()}/dist/#/login?redirect=/hrApp`;
     }
 
+    function robotAdapterUrl() {
+      return `http://127.0.0.1:8765/api/robot/sample?host=${encodeURIComponent(robotIp())}&rbt_id=0`;
+    }
+
     function syncRobotPluginFrame() {
       $("robotPluginFrame").src = robotPluginUrl();
     }
 
     async function checkRobotConnection() {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 1600);
+      const timer = setTimeout(() => controller.abort(), 2200);
       try {
-        await fetch(robotPluginUrl(), {
-          mode: "no-cors",
+        const response = await fetch(robotAdapterUrl(), {
           cache: "no-store",
           signal: controller.signal
         });
-        return true;
+        if (!response.ok) return false;
+        const sample = await response.json();
+        state.lastRobotSample = sample;
+        updateWeldMetrics();
+        return Boolean(sample.connected);
       } catch (error) {
         return false;
       } finally {
         clearTimeout(timer);
+      }
+    }
+
+    async function pollRobotSample() {
+      try {
+        const response = await fetch(robotAdapterUrl(), { cache: "no-store" });
+        if (!response.ok) throw new Error("adapter unavailable");
+        const sample = await response.json();
+        state.lastRobotSample = sample;
+        if (!sample.connected) {
+          stopRobotDataTimer();
+          stopWeldingTimer();
+          state.isWelding = false;
+          setRobotConnectionState(false, `未连接：${robotIp()} 数据读取中断`);
+          $("weldingState").textContent = "未连接";
+          $("weldingState").className = "status red";
+          return;
+        }
+        updateWeldMetrics();
+      } catch (error) {
+        stopRobotDataTimer();
+        stopWeldingTimer();
+        state.isWelding = false;
+        setRobotConnectionState(false, "未连接：本地采集服务不可达");
+        $("weldingState").textContent = "未连接";
+        $("weldingState").className = "status red";
       }
     }
 
@@ -2036,12 +2065,15 @@
         setRobotConnectionState(false);
         $("weldingState").textContent = "待连接";
         $("weldingState").className = "status yellow";
+        state.lastRobotSample = null;
+        updateWeldMetrics();
         toast(`机器人地址已切换为 ${robotIp()}`);
       });
     });
 
     $("enableRobotBtn").addEventListener("click", async () => {
       stopWeldingTimer();
+      stopRobotDataTimer();
       syncRobotPluginFrame();
       $("enableRobotBtn").disabled = true;
       $("weldingState").textContent = "连接检测中";
@@ -2068,12 +2100,15 @@
         state.weldSeconds += 1;
         updateWeldMetrics();
       }, 1000);
+      state.robotDataTimer = setInterval(pollRobotSample, 500);
+      pollRobotSample();
       updateWeldMetrics();
       toast(`已连接机器人 ${robotIp()}，请在 WeldPlus 插件中执行焊接任务`);
     });
 
     $("completeWeldingTaskBtn").addEventListener("click", () => {
       stopWeldingTimer();
+      stopRobotDataTimer();
       state.isWelding = false;
       state.weldingCompleted = true;
       state.weldSeconds = Math.max(state.weldSeconds, 72);
@@ -2089,6 +2124,7 @@
 
     $("disableRobotBtn").addEventListener("click", () => {
       stopWeldingTimer();
+      stopRobotDataTimer();
       state.isWelding = false;
       setRobotConnectionState(false);
       $("weldingState").textContent = state.weldingCompleted ? "已断联" : "已断联 / 未完成";
