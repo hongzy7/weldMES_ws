@@ -33,12 +33,18 @@
       box-sizing: border-box;
     }
 
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       margin: 0;
-      min-height: 100vh;
+      height: 100vh;
       background: var(--bg);
       color: var(--text);
       letter-spacing: 0;
+      overflow: hidden;
     }
 
     button,
@@ -54,17 +60,17 @@
     }
 
     .app {
-      min-height: 100vh;
+      height: 100vh;
       display: grid;
-      grid-template-rows: 72px 1fr;
+      grid-template-rows: 56px minmax(0, 1fr);
     }
 
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      padding: 0 28px;
+      gap: 12px;
+      padding: 0 14px;
       background: #ffffff;
       border-bottom: 1px solid var(--line);
       position: sticky;
@@ -76,19 +82,19 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      min-width: 280px;
+      min-width: 250px;
     }
 
     .brand-logo-crop {
-      width: 58px;
-      height: 42px;
+      width: 50px;
+      height: 34px;
       overflow: hidden;
       flex: 0 0 auto;
     }
 
     .brand-logo {
       width: 128px;
-      height: 42px;
+      height: 34px;
       display: block;
       object-fit: contain;
       object-position: left center;
@@ -96,7 +102,7 @@
 
     .brand h1 {
       margin: 0;
-      font-size: 20px;
+      font-size: 18px;
       line-height: 1.15;
     }
 
@@ -104,21 +110,21 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     .chip {
-      min-height: 34px;
+      min-height: 30px;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       border: 1px solid var(--line);
       background: #fff;
       color: var(--muted);
-      padding: 6px 10px;
+      padding: 5px 8px;
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12px;
       white-space: nowrap;
     }
 
@@ -144,56 +150,57 @@
 
     .shell {
       display: grid;
-      grid-template-columns: 270px minmax(0, 1fr);
+      grid-template-columns: 246px minmax(0, 1fr);
       min-height: 0;
     }
 
     .sidebar {
       background: #ffffff;
       border-right: 1px solid var(--line);
-      padding: 18px 14px;
+      padding: 9px;
       overflow-y: auto;
+      min-height: 0;
     }
 
     .nav-title {
-      margin: 0 0 10px;
+      margin: 0 0 7px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
     }
 
     .nav-list {
       display: grid;
-      gap: 8px;
+      gap: 4px;
     }
 
     .nav-legend {
-      margin-top: 16px;
-      padding: 12px;
+      margin-top: 8px;
+      padding: 8px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--panel-2);
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
 
     .legend-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1.35;
     }
 
     .nav-item {
       width: 100%;
-      min-height: 54px;
+      min-height: 39px;
       display: grid;
-      grid-template-columns: 32px 1fr auto;
+      grid-template-columns: 26px 1fr auto;
       align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
+      gap: 8px;
+      padding: 4px 7px;
       background: #fff;
       color: var(--text);
       border: 1px solid transparent;
@@ -213,8 +220,8 @@
     }
 
     .nav-index {
-      width: 32px;
-      height: 32px;
+      width: 26px;
+      height: 26px;
       display: grid;
       place-items: center;
       border-radius: 8px;
@@ -234,7 +241,7 @@
 
     .nav-label strong {
       display: block;
-      font-size: 15px;
+      font-size: 13px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -244,7 +251,7 @@
       display: block;
       margin-top: 2px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -271,8 +278,9 @@
 
     .content {
       min-width: 0;
-      padding: 22px;
-      overflow-y: auto;
+      min-height: 0;
+      padding: 9px;
+      overflow: hidden;
     }
 
     .view {
@@ -280,49 +288,108 @@
     }
 
     .view.active {
-      display: block;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: auto;
+      gap: 8px;
+    }
+
+    .view.active > .grid,
+    .view.active > .panel,
+    .view.active > .chart-grid {
+      min-height: 0;
+      overflow: auto;
+    }
+
+    #view-dashboard > .panel,
+    #view-task > .panel,
+    #view-bi > .grid {
+      flex: 1 1 auto;
+    }
+
+    #view-welding.view.active {
+      overflow: hidden;
     }
 
     .section-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 18px;
+      gap: 12px;
+      margin-bottom: 6px;
+      flex: 0 0 auto;
     }
 
     .section-head h2 {
       margin: 0;
-      font-size: 24px;
+      font-size: 20px;
       line-height: 1.2;
     }
 
     .section-head p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      line-height: 1.55;
-      max-width: 760px;
+      display: none;
     }
 
     .actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
     }
 
+    .robot-address {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .ip-boxes {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .ip-boxes input {
+      width: 38px;
+      min-height: 28px;
+      border: 1px solid var(--line-strong);
+      border-radius: 4px;
+      background: #fff;
+      outline: none;
+      color: var(--text);
+      font-weight: 800;
+      text-align: center;
+      padding: 2px 4px;
+    }
+
+    .ip-dot {
+      color: var(--muted);
+      font-weight: 900;
+    }
+
     .btn {
-      min-height: 44px;
+      min-height: 38px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 10px 16px;
+      gap: 6px;
+      padding: 8px 12px;
       border-radius: 8px;
       background: #edf2f8;
       color: var(--text);
       border: 1px solid var(--line);
       font-weight: 700;
+      font-size: 13px;
       white-space: nowrap;
     }
 
@@ -361,7 +428,8 @@
 
     .grid {
       display: grid;
-      gap: 14px;
+      gap: 8px;
+      min-height: 0;
     }
 
     .grid.cols-2 {
@@ -376,11 +444,17 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
+    .view.active > .grid.cols-4 {
+      flex: 0 0 auto;
+    }
+
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+      min-height: 0;
+      overflow: hidden;
     }
 
     .panel.tight {
@@ -388,56 +462,65 @@
     }
 
     .panel-head {
-      padding: 16px 18px;
+      padding: 8px 10px;
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 8px;
+    }
+
+    .panel-head-actions {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: nowrap;
     }
 
     .panel-head h3 {
       margin: 0;
-      font-size: 17px;
+      font-size: 14px;
       line-height: 1.2;
     }
 
     .panel-body {
-      padding: 18px;
+      padding: 9px;
+      min-height: 0;
     }
 
     .metric {
-      padding: 18px;
-      min-height: 116px;
+      padding: 10px;
+      min-height: 78px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 14px;
+      gap: 5px;
     }
 
     .metric span {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .metric strong {
       display: block;
-      font-size: 30px;
+      font-size: 22px;
       line-height: 1;
     }
 
     .metric small {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 11px;
     }
 
     .status {
       display: inline-flex;
       align-items: center;
-      min-height: 30px;
-      padding: 5px 10px;
+      min-height: 26px;
+      padding: 4px 8px;
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
       white-space: nowrap;
     }
@@ -463,7 +546,12 @@
     }
 
     .table-wrap {
-      overflow-x: auto;
+      max-height: min(48vh, 390px);
+      overflow: auto;
+    }
+
+    .table-wrap.fit-table {
+      overflow: auto;
     }
 
     table {
@@ -472,20 +560,32 @@
       min-width: 760px;
     }
 
+    .fit-table table {
+      min-width: 0;
+      table-layout: fixed;
+    }
+
     th,
     td {
-      padding: 13px 12px;
+      padding: 7px 8px;
       border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: middle;
-      font-size: 14px;
+      font-size: 12px;
       white-space: nowrap;
+    }
+
+    .fit-table th,
+    .fit-table td {
+      padding: 7px 8px;
+      white-space: normal;
+      word-break: break-word;
     }
 
     th {
       color: var(--muted);
       background: var(--panel-2);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
     }
 
@@ -504,34 +604,34 @@
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      gap: 9px;
     }
 
     .field {
       display: grid;
-      gap: 7px;
+      gap: 5px;
     }
 
     .field label {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
     }
 
     .field input,
     .field select,
     .field textarea {
-      min-height: 46px;
+      min-height: 38px;
       border: 1px solid var(--line-strong);
       border-radius: 8px;
       background: #fff;
       color: var(--text);
-      padding: 9px 11px;
+      padding: 7px 9px;
       outline: none;
     }
 
     .field textarea {
-      min-height: 98px;
+      min-height: 72px;
       resize: vertical;
     }
 
@@ -545,22 +645,23 @@
     .step-footer {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      margin-top: 16px;
+      margin-top: 6px;
+      flex: 0 0 auto;
     }
 
     .equipment-list {
       display: grid;
-      gap: 12px;
+      gap: 7px;
     }
 
     .equipment-row {
       display: grid;
       grid-template-columns: 1fr auto auto;
       align-items: center;
-      gap: 12px;
-      padding: 12px;
+      gap: 8px;
+      padding: 8px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel-2);
@@ -573,18 +674,18 @@
 
     .equipment-row span {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .flow-line {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 10px;
+      gap: 8px;
     }
 
     .flow-card {
-      min-height: 88px;
-      padding: 12px;
+      min-height: 68px;
+      padding: 9px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel-2);
@@ -592,7 +693,7 @@
 
     .flow-card strong {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
 
     .bar {
@@ -622,120 +723,98 @@
     }
 
     .weld-stage {
-      min-height: 318px;
+      min-height: 0;
+      flex: 1 1 auto;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
-      gap: 14px;
+      grid-template-columns: minmax(0, 1fr) 270px;
+      gap: 8px;
       align-items: stretch;
     }
 
-    .robot-visual {
+    .plugin-window {
       position: relative;
-      min-height: 318px;
+      height: clamp(330px, calc(100vh - 174px), 620px);
+      min-height: 0;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background:
-        linear-gradient(90deg, rgba(22, 32, 51, 0.05) 1px, transparent 1px),
-        linear-gradient(rgba(22, 32, 51, 0.05) 1px, transparent 1px),
-        #f8fbff;
-      background-size: 28px 28px;
+      background: #f8fbff;
       overflow: hidden;
+      color: inherit;
     }
 
-    .robot-base {
-      position: absolute;
-      left: 13%;
-      bottom: 15%;
-      width: 112px;
-      height: 58px;
+    .robot-interface-panel .panel-body {
+      padding: 0;
+    }
+
+    .robot-interface-panel .plugin-window {
+      border: 0;
+      border-radius: 0 0 8px 8px;
+    }
+
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 8px;
-      background: #516072;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--blue);
+      font-size: 16px;
+      font-weight: 900;
     }
 
-    .robot-arm-a,
-    .robot-arm-b,
-    .robot-torch {
+    .plugin-frame-wrap {
+      position: relative;
+      min-height: 0;
+      height: 100%;
+      background: #eef3f9 url("assets/welding-plugin-ui.png") center top / cover no-repeat;
+    }
+
+    .plugin-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+    }
+
+    .plugin-frame-note {
       position: absolute;
-      transform-origin: left center;
-      border-radius: 999px;
-      background: #1769e0;
-    }
-
-    .robot-arm-a {
-      left: calc(13% + 74px);
-      bottom: calc(15% + 42px);
-      width: 190px;
-      height: 26px;
-      transform: rotate(-28deg);
-    }
-
-    .robot-arm-b {
-      left: calc(13% + 230px);
-      bottom: calc(15% + 128px);
-      width: 172px;
-      height: 22px;
-      background: #18a17a;
-      transform: rotate(25deg);
-    }
-
-    .robot-torch {
-      left: calc(13% + 377px);
-      bottom: calc(15% + 64px);
-      width: 88px;
-      height: 16px;
-      background: #303b4b;
-      transform: rotate(53deg);
-    }
-
-    .workpiece {
-      position: absolute;
-      right: 10%;
-      bottom: 15%;
-      width: 210px;
-      height: 86px;
+      left: 14px;
+      bottom: 14px;
+      padding: 5px 8px;
       border-radius: 8px;
-      background: repeating-linear-gradient(135deg, #c7d2df 0 14px, #dce5ef 14px 28px);
-      border: 1px solid #a8b7c9;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      pointer-events: none;
     }
 
-    .arc {
-      position: absolute;
-      right: 20%;
-      bottom: 31%;
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: var(--yellow);
-      box-shadow: 0 0 0 8px rgba(255, 190, 60, 0.22), 0 0 26px rgba(255, 183, 0, 0.75);
-      opacity: 0;
+    .plugin-window.is-active {
+      border-color: rgba(22, 105, 224, 0.55);
+      box-shadow: 0 0 0 3px rgba(22, 105, 224, 0.12);
     }
 
-    .is-welding .arc {
-      animation: pulse 0.8s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        opacity: 0.55;
-        transform: scale(0.86);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1.18);
-      }
+    .plugin-window.is-error {
+      border-color: rgba(199, 53, 45, 0.55);
+      box-shadow: 0 0 0 3px rgba(199, 53, 45, 0.12);
     }
 
     .process-values {
       display: grid;
-      gap: 10px;
+      gap: 7px;
     }
 
     .value-row {
       display: grid;
       grid-template-columns: 1fr auto;
       align-items: center;
-      gap: 8px;
-      padding: 11px 12px;
+      gap: 6px;
+      padding: 8px 9px;
       border-radius: 8px;
       background: var(--panel-2);
       border: 1px solid var(--line);
@@ -743,21 +822,21 @@
 
     .value-row span {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .value-row strong {
-      font-size: 17px;
+      font-size: 14px;
     }
 
     .trace-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      gap: 8px;
     }
 
     .trace-item {
-      padding: 14px;
+      padding: 9px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel-2);
@@ -766,31 +845,31 @@
     .trace-item span {
       display: block;
       color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 7px;
+      font-size: 12px;
+      margin-bottom: 5px;
     }
 
     .chart-grid {
       display: grid;
       grid-template-columns: 1.1fr 0.9fr;
-      gap: 14px;
+      gap: 8px;
     }
 
     .chart-bars {
       display: grid;
-      gap: 14px;
+      gap: 9px;
     }
 
     .chart-row {
       display: grid;
-      grid-template-columns: 104px 1fr 58px;
+      grid-template-columns: 90px 1fr 46px;
       align-items: center;
-      gap: 12px;
-      font-size: 14px;
+      gap: 8px;
+      font-size: 12px;
     }
 
     .donut {
-      width: min(260px, 72vw);
+      width: min(190px, 72vw);
       aspect-ratio: 1;
       border-radius: 50%;
       background: conic-gradient(var(--green) 0 78%, var(--red) 78% 88%, var(--yellow) 88% 100%);
@@ -811,7 +890,8 @@
       text-align: center;
       font-weight: 800;
       color: var(--text);
-      padding: 16px;
+      padding: 10px;
+      font-size: 12px;
     }
 
     .toast {
@@ -931,7 +1011,7 @@
         </div>
       </div>
       <div class="top-status">
-        <span class="chip"><span class="dot good" id="topRobotDot"></span><span id="topRobotText">机器人 RBT-06 正常</span></span>
+        <span class="chip"><span class="dot bad" id="topRobotDot"></span><span id="topRobotText">机器人未连接</span></span>
         <span class="chip"><span class="dot warn" id="topTaskDot"></span><span id="topTaskText">当前任务待确认</span></span>
         <span class="chip">操作员：<strong id="topOperator">未登录</strong></span>
         <button class="btn primary" data-nav="dashboard">返回工作台</button>
@@ -955,7 +1035,6 @@
           <div class="section-head">
             <div>
               <h2>今日任务工作台</h2>
-              <p>面向工控触屏的现场首页，集中显示设备、人员、任务、报警和快速入口。</p>
             </div>
             <div class="actions">
               <button class="btn primary" data-nav="login">开始作业流程</button>
@@ -995,8 +1074,8 @@
               </div>
               <div class="panel-body equipment-list">
                 <div class="equipment-row">
-                  <div><strong>机器人 RBT-06</strong><span>控制器在线，程序读取正常</span></div>
-                  <span class="status green">正常</span>
+                  <div><strong>机器人 RBT-06</strong><span id="dashboardRobotText">等待连接机器人控制器</span></div>
+                  <span class="status red" id="dashboardRobotStatus">未连接</span>
                   <button class="btn ghost" data-nav="precheck">查看</button>
                 </div>
                 <div class="equipment-row">
@@ -1037,7 +1116,7 @@
               <h3>待执行焊缝任务</h3>
               <span class="status blue">点击任务进入确认</span>
             </div>
-            <div class="table-wrap">
+            <div class="table-wrap fit-table">
               <table>
                 <thead>
                   <tr>
@@ -1061,7 +1140,6 @@
           <div class="section-head">
             <div>
               <h2>操作人员登录</h2>
-              <p>确认现场操作者身份、权限和登录时间，后续任务、材料、工艺、过程数据均关联到该人员。</p>
             </div>
             <div class="actions">
               <button class="btn ghost" id="scanBadgeBtn">模拟刷卡</button>
@@ -1116,7 +1194,6 @@
           <div class="section-head">
             <div>
               <h2>工控机自检</h2>
-              <p>启动后确认机器人、焊机、气瓶、扫码设备和采集链路是否满足当前作业要求。</p>
             </div>
             <div class="actions">
               <button class="btn primary" id="runPrecheckBtn">一键自检</button>
@@ -1136,7 +1213,6 @@
           <div class="section-head">
             <div>
               <h2>焊接材料录入</h2>
-              <p>通过扫码或人工确认建立焊丝、气体、气瓶与当前任务的材料追溯关系。</p>
             </div>
             <div class="actions">
               <button class="btn ghost" id="scanWireBtn">扫描焊丝</button>
@@ -1185,7 +1261,6 @@
           <div class="section-head">
             <div>
               <h2>工件信息确认</h2>
-              <p>确认本次焊接工件、订单、项目、区域与材质，为焊缝任务和追溯链路提供工件上下文。</p>
             </div>
             <div class="actions">
               <button class="btn ghost" id="scanWorkpieceBtn">扫描工件</button>
@@ -1230,7 +1305,6 @@
           <div class="section-head">
             <div>
               <h2>焊缝任务确认</h2>
-              <p>从客户侧导入的焊缝任务清单中选择当前要执行的任务，确认焊缝编号、类型、板厚、位置和状态。</p>
             </div>
             <div class="actions">
               <button class="btn primary" id="confirmTaskBtn">确认选中任务</button>
@@ -1238,7 +1312,7 @@
           </div>
           <div class="panel">
             <div class="panel-head"><h3>任务清单</h3><span class="status blue" id="selectedTaskLabel">默认选中 W-A3-018</span></div>
-            <div class="table-wrap">
+            <div class="table-wrap fit-table">
               <table>
                 <thead>
                   <tr>
@@ -1266,7 +1340,6 @@
           <div class="section-head">
             <div>
               <h2>工艺确认</h2>
-              <p>根据焊缝类型、材质和板厚匹配推荐工艺；现场允许微调，但实际设定值必须写入焊接记录。</p>
             </div>
             <div class="actions">
               <button class="btn ghost" id="loadProcessBtn">匹配推荐工艺</button>
@@ -1320,25 +1393,46 @@
           <div class="section-head">
             <div>
               <h2>机器人焊接</h2>
-              <p>操作人员使用机器人完成焊接，系统采集机器人编号、程序号、电流、电压、焊接时间、长度和报警。</p>
             </div>
             <div class="actions">
-              <button class="btn good" id="startWeldingBtn">开始焊接</button>
-              <button class="btn warn" id="pauseWeldingBtn">暂停</button>
-              <button class="btn primary" id="finishWeldingBtn">完成焊接</button>
+              <label class="robot-address">机器人地址
+                <span class="ip-boxes" aria-label="机器人地址">
+                  <input id="robotIp1" value="192" inputmode="numeric" maxlength="3" aria-label="IP 第一段">
+                  <span class="ip-dot">.</span>
+                  <input id="robotIp2" value="168" inputmode="numeric" maxlength="3" aria-label="IP 第二段">
+                  <span class="ip-dot">.</span>
+                  <input id="robotIp3" value="0" inputmode="numeric" maxlength="3" aria-label="IP 第三段">
+                  <span class="ip-dot">.</span>
+                  <input id="robotIp4" value="10" inputmode="numeric" maxlength="3" aria-label="IP 第四段">
+                </span>
+              </label>
+              <button class="btn good" id="enableRobotBtn">机器人连接</button>
+              <button class="btn primary" id="completeWeldingTaskBtn" disabled>完成当前焊接任务</button>
+              <button class="btn warn" id="disableRobotBtn" disabled>机器人断联</button>
             </div>
           </div>
           <div class="weld-stage">
-            <div class="panel">
-              <div class="panel-head"><h3>现场执行</h3><span class="status yellow" id="weldingState">待开始</span></div>
+            <div class="panel robot-interface-panel">
+              <div class="panel-head">
+                <h3>机器人操作界面</h3>
+                <div class="panel-head-actions">
+                  <span class="status yellow" id="weldingState">待开始</span>
+                  <button class="icon-btn" id="expandPluginBtn" type="button" title="放大到新标签页" aria-label="放大到新标签页">↗</button>
+                </div>
+              </div>
               <div class="panel-body">
-                <div class="robot-visual" id="robotVisual">
-                  <div class="robot-base"></div>
-                  <div class="robot-arm-a"></div>
-                  <div class="robot-arm-b"></div>
-                  <div class="robot-torch"></div>
-                  <div class="workpiece"></div>
-                  <div class="arc"></div>
+                <div class="plugin-window" id="pluginPreview">
+                  <div class="plugin-frame-wrap">
+                    <iframe
+                      class="plugin-frame"
+                      id="robotPluginFrame"
+                      src="http://192.168.0.10/dist/#/login?redirect=/hrApp"
+                      title="华沿 WeldPlus 焊接插件"
+                      scrolling="no"
+                      loading="eager"
+                    ></iframe>
+                    <div class="plugin-frame-note" id="pluginFrameNote">WeldPlus 插件嵌入窗口</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1364,7 +1458,6 @@
           <div class="section-head">
             <div>
               <h2>焊缝检查</h2>
-              <p>检查人员确认焊缝尺寸、外观、缺陷、附件和最终结果，形成焊后质量记录。</p>
             </div>
             <div class="actions">
               <button class="btn good" id="inspectionOkBtn">判定 OK</button>
@@ -1429,7 +1522,6 @@
           <div class="section-head">
             <div>
               <h2>焊缝质量追溯</h2>
-              <p>按焊缝编号串联人、机、料、法、工件、过程参数和检查结果，支持质量追溯与客户审计。</p>
             </div>
             <div class="actions">
               <button class="btn ghost" id="refreshTraceBtn">刷新追溯</button>
@@ -1459,7 +1551,6 @@
           <div class="section-head">
             <div>
               <h2>BI 分析看板</h2>
-              <p>从机器人侧 MES 记录读取任务、材料、工艺、过程和检查数据，输出进度、效率、质量、报警和工艺符合分析。</p>
             </div>
             <div class="actions">
               <button class="btn ghost" data-nav="dashboard">返回工作台</button>
@@ -1545,6 +1636,8 @@
       selectedTask: "TASK-260512-018",
       operator: "未登录",
       taskStatus: "待开工",
+      robotConnected: false,
+      weldingCompleted: false,
       isWelding: false,
       weldSeconds: 0,
       weldTimer: null,
@@ -1739,6 +1832,61 @@
       $("actualLength").textContent = `${Math.min(selectedTask().length, Math.round(state.weldSeconds * 18))} mm`;
     }
 
+    function updateRobotActionButtons() {
+      $("enableRobotBtn").disabled = state.robotConnected;
+      $("completeWeldingTaskBtn").disabled = !state.robotConnected || state.weldingCompleted;
+      $("disableRobotBtn").disabled = !state.robotConnected;
+    }
+
+    function setRobotConnectionState(connected, message = "") {
+      state.robotConnected = connected;
+      $("pluginPreview").classList.toggle("is-active", connected);
+      $("pluginPreview").classList.toggle("is-error", !connected && Boolean(message));
+      $("topRobotDot").className = `dot ${connected ? "good" : "bad"}`;
+      $("topRobotText").textContent = connected ? `机器人 ${robotIp()} 已连接` : "机器人未连接";
+      $("dashboardRobotText").textContent = connected ? `控制器 ${robotIp()} 在线，插件窗口已连接` : "等待连接机器人控制器";
+      $("dashboardRobotStatus").textContent = connected ? "已连接" : "未连接";
+      $("dashboardRobotStatus").className = `status ${connected ? "green" : "red"}`;
+      $("pluginFrameNote").textContent = connected ? "WeldPlus 插件嵌入窗口" : (message || "未连接：请检查机器人 IP / 网段");
+      updateRobotActionButtons();
+    }
+
+    function normalizeIpPart(input) {
+      const raw = input.value.replace(/\D/g, "");
+      const value = Math.min(255, Math.max(0, Number(raw || 0)));
+      input.value = String(value);
+      return input.value;
+    }
+
+    function robotIp() {
+      return ["robotIp1", "robotIp2", "robotIp3", "robotIp4"].map(id => normalizeIpPart($(id))).join(".");
+    }
+
+    function robotPluginUrl() {
+      return `http://${robotIp()}/dist/#/login?redirect=/hrApp`;
+    }
+
+    function syncRobotPluginFrame() {
+      $("robotPluginFrame").src = robotPluginUrl();
+    }
+
+    async function checkRobotConnection() {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 1600);
+      try {
+        await fetch(robotPluginUrl(), {
+          mode: "no-cors",
+          cache: "no-store",
+          signal: controller.signal
+        });
+        return true;
+      } catch (error) {
+        return false;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
     document.addEventListener("click", event => {
       const navTarget = event.target.closest("[data-nav]");
       if (navTarget) {
@@ -1807,8 +1955,8 @@
       renderPrecheck(["PASS", "FAIL", "PASS", "PASS", "PASS"]);
       $("precheckOverall").textContent = "FAIL";
       $("precheckOverall").className = "status red";
-      $("topRobotDot").className = "dot bad";
-      $("topRobotText").textContent = "焊机采集异常";
+      $("welderStatus").textContent = "异常";
+      $("welderStatus").className = "status red";
       toast("已模拟焊机采集异常");
     });
 
@@ -1868,44 +2016,84 @@
       toast("实际工艺参数已记录");
     });
 
-    $("startWeldingBtn").addEventListener("click", () => {
+    $("expandPluginBtn").addEventListener("click", () => {
+      syncRobotPluginFrame();
+      window.open(robotPluginUrl(), "_blank", "noopener,noreferrer");
+      toast("已在新标签页打开 WeldPlus 插件");
+    });
+
+    ["robotIp1", "robotIp2", "robotIp3", "robotIp4"].forEach((id, index, ids) => {
+      $(id).addEventListener("input", event => {
+        event.target.value = event.target.value.replace(/\D/g, "").slice(0, 3);
+        if (event.target.value.length === 3 && ids[index + 1]) $(ids[index + 1]).focus();
+      });
+      $(id).addEventListener("change", () => {
+        if (state.robotConnected) {
+          toast("机器人已连接，如需切换地址请先断联");
+          return;
+        }
+        syncRobotPluginFrame();
+        setRobotConnectionState(false);
+        $("weldingState").textContent = "待连接";
+        $("weldingState").className = "status yellow";
+        toast(`机器人地址已切换为 ${robotIp()}`);
+      });
+    });
+
+    $("enableRobotBtn").addEventListener("click", async () => {
       stopWeldingTimer();
+      syncRobotPluginFrame();
+      $("enableRobotBtn").disabled = true;
+      $("weldingState").textContent = "连接检测中";
+      $("weldingState").className = "status yellow";
+      const connected = await checkRobotConnection();
+      if (!connected) {
+        state.isWelding = false;
+        state.weldingCompleted = false;
+        setRobotConnectionState(false, `未连接：${robotIp()} 网段或插件服务不可达`);
+        $("weldingState").textContent = "未连接";
+        $("weldingState").className = "status red";
+        toast(`未连接机器人 ${robotIp()}，请检查网段或插件服务`);
+        return;
+      }
+      setRobotConnectionState(true);
+      state.weldingCompleted = false;
       state.isWelding = true;
       state.weldSeconds = Math.max(state.weldSeconds, 1);
-      $("robotVisual").classList.add("is-welding");
-      $("weldingState").textContent = "焊接中";
+      $("weldingState").textContent = "已连接 / 插件待执行";
       $("weldingState").className = "status blue";
       $("recordNo").textContent = "REC-260512-018";
       setTaskStatus("焊接中");
-      complete("welding");
       state.weldTimer = setInterval(() => {
         state.weldSeconds += 1;
         updateWeldMetrics();
       }, 1000);
       updateWeldMetrics();
-      toast("机器人焊接已开始");
+      toast(`已连接机器人 ${robotIp()}，请在 WeldPlus 插件中执行焊接任务`);
     });
 
-    $("pauseWeldingBtn").addEventListener("click", () => {
+    $("completeWeldingTaskBtn").addEventListener("click", () => {
       stopWeldingTimer();
       state.isWelding = false;
-      $("robotVisual").classList.remove("is-welding");
-      $("weldingState").textContent = "暂停";
-      $("weldingState").className = "status yellow";
-      toast("焊接已暂停");
-    });
-
-    $("finishWeldingBtn").addEventListener("click", () => {
-      stopWeldingTimer();
-      state.isWelding = false;
+      state.weldingCompleted = true;
       state.weldSeconds = Math.max(state.weldSeconds, 72);
-      $("robotVisual").classList.remove("is-welding");
-      $("weldingState").textContent = "已完成";
+      $("weldingState").textContent = "任务已完成";
       $("weldingState").className = "status green";
       $("alarmCode").textContent = "无";
       updateWeldMetrics();
       setTaskStatus("待检查");
-      toast("焊接完成，任务流转到待检查");
+      complete("welding");
+      updateRobotActionButtons();
+      toast("焊接任务已确认完成，任务流转到待检查");
+    });
+
+    $("disableRobotBtn").addEventListener("click", () => {
+      stopWeldingTimer();
+      state.isWelding = false;
+      setRobotConnectionState(false);
+      $("weldingState").textContent = state.weldingCompleted ? "已断联" : "已断联 / 未完成";
+      $("weldingState").className = state.weldingCompleted ? "status green" : "status yellow";
+      toast("机器人已断联");
     });
 
     $("inspectionOkBtn").addEventListener("click", () => {
@@ -1956,6 +2144,7 @@
     renderPrecheck();
     updateTrace();
     syncRoleLanding();
+    setRobotConnectionState(false);
   </script>
 </body>
 </html>

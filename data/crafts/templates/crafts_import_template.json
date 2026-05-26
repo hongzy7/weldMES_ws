@@ -1,0 +1,99 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "exportTime": "填写导出时间，例如 2026-05-18 10:30:00",
+    "totalCount": 1
+  },
+  "crafts": [
+    {
+      "id": "填写唯一工艺ID，建议使用系统生成或时间戳",
+      "type": "arc",
+      "job": "填写工艺名称，例如 I型对焊_3mm",
+      "deviceName": "填写控制柜/焊机设备名称，例如 Megmeet_350_3",
+      "params": {
+        "arcOn": {
+          "arcOnCurrent": "填写数字：起弧电流",
+          "arcOnAirPressure": "填写数字：起弧气压，没有则填 0",
+          "arcOnJobNumber": "填写数字：起弧 Job 号，没有则填 0",
+          "arcOnProgramNumber": "填写数字：起弧程序号，通常填 1",
+          "arcOnMode": "填写数字：起弧模式，默认可填 0",
+          "arcOnPowerCorrection": "填写数字：起弧功率修正，默认可填 0",
+          "arcOnTime": "填写数字：起弧时间，默认可填 0",
+          "arcOnVoltage": "填写数字：起弧电压",
+          "arcOnWireSpeed": "填写数字：起弧送丝速度，没有则填 0",
+          "arcOnInductance": "填写数字：起弧电感，默认可填 0",
+          "arcOnInterpulse": "填写数字：起弧脉冲/间脉冲，默认可填 0",
+          "arcOnSlope": "填写数字：起弧斜率，默认可填 0",
+          "preflowTime": "填写数字：提前送气时间，默认可填 0",
+          "arcOnArcControl": "填写数字：起弧电弧控制，默认可填 0",
+          "arcOnVoltageCompensation": "填写数字：起弧电压补偿，默认可填 0",
+          "arcOnArcLength": "填写数字：起弧弧长，默认可填 0"
+        },
+        "arcSet": {
+          "arcSetCurrent": "填写数字：焊接过程中电流",
+          "arcSetJobNumber": "填写数字：焊接 Job 号，没有则填 0",
+          "arcSetProgramNumber": "填写数字：焊接程序号，通常填 1",
+          "arcSetMode": "填写数字：焊接模式，默认可填 0",
+          "arcSetPowerCorrection": "填写数字：焊接功率修正，默认可填 0",
+          "arcSetVoltage": "填写数字：焊接过程中电压",
+          "arcSetVoltageCompensation": "填写数字：焊接电压补偿，默认可填 0",
+          "arcSetArcLength": "填写数字：焊接弧长，默认可填 0",
+          "arcSetWireSpeed": "填写数字：焊接送丝速度，没有则填 0",
+          "arcSetInductance": "填写数字：焊接电感，默认可填 0",
+          "arcSetInterpulse": "填写数字：焊接脉冲/间脉冲，默认可填 0",
+          "arcSetSlope": "填写数字：焊接斜率，默认可填 0",
+          "speed": "填写数字：机器人焊接行走速度",
+          "arcSetScanSpeed": "填写数字：扫描速度，默认可填 200",
+          "arcSetScanLength": "填写数字：扫描长度，默认可填 2",
+          "arcSetSpduty": "填写数字：摆动占空比，默认可填 50",
+          "arcSetSpfreq": "填写数字：摆动频率，默认可填 2000",
+          "arcSetSwingFrequency": "填写数字：摆动频率，没有则填 0",
+          "arcSetSwingLength": "填写数字：摆动长度，没有则填 0",
+          "arcSetArcControl": "填写数字：焊接电弧控制，默认可填 0",
+          "pulseFineTuning": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "arcOff": {
+          "arcOffCurrent": "填写数字：收弧电流",
+          "arcOffJobNumber": "填写数字：收弧 Job 号，没有则填 0",
+          "arcOffProgramNumber": "填写数字：收弧程序号，通常填 1",
+          "arcOffMode": "填写数字：收弧模式，默认可填 0",
+          "arcOffPowerCorrection": "填写数字：收弧功率修正，默认可填 0",
+          "arcOffTime": "填写数字：收弧时间，默认可填 0",
+          "arcOffDistance": "填写数字：收弧距离，默认可填 0",
+          "enableArcOffDistance": "填写布尔值：是否启用收弧距离，true 或 false",
+          "arcOffVoltage": "填写数字：收弧电压",
+          "arcOffWireSpeed": "填写数字：收弧送丝速度，没有则填 0",
+          "burnBackTime": "填写数字：回烧时间，默认可填 0",
+          "enableBurnback": "填写数字：是否启用回烧，通常 0 或 1",
+          "postflowTime": "填写数字：滞后送气时间，默认可填 0",
+          "arcOffInductance": "填写数字：收弧电感，默认可填 0",
+          "arcOffInterpulse": "填写数字：收弧脉冲/间脉冲，默认可填 0",
+          "arcOffSlope": "填写数字：收弧斜率，默认可填 0",
+          "arcOffArcControl": "填写数字：收弧电弧控制，默认可填 0",
+          "arcOffVoltageCompensation": "填写数字：收弧电压补偿，默认可填 0",
+          "arcOffArcLength": "填写数字：收弧弧长，默认可填 0"
+        },
+        "weldProgram": {
+          "isUseMemorySlot": "填写数字：是否使用存储槽，通常 0 或 1",
+          "programNumber": "填写数字：焊接程序号，通常填 1",
+          "weldProcess": "填写数字：焊接工艺类型编码",
+          "weldWireType": "填写数字：焊丝类型编码",
+          "weldWireSize": "填写数字：焊丝直径/规格编码",
+          "weldGasType": "填写数字：保护气体类型编码"
+        }
+      }
+    }
+  ]
+}
